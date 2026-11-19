@@ -1,0 +1,40 @@
+#pastas que o unity gera sozinho
+/[Ll]ibrary/
+/[Tt]emp/
+/[Oo]bj/
+/[Bb]uild/
+/[Bb]uilds/
+/[Ll]ogs/
+/[Uu]ser[Ss]ettings/
+/[Mm]emoryCaptures/
+/[Rr]ecordings/
+
+#arquivos do visual studio e vs code
+.vs/
+.vscode/
+.idea/
+*.csproj
+*.sln
+*.slnx
+*.suo
+*.user
+*.userprefs
+*.pidb
+*.booproj
+*.svd
+*.pdb
+*.mdb
+*.opendb
+*.VC.db
+
+#executavel e pacotes gerados (vao na release)
+*.apk
+*.aab
+*.unitypackage
+*.zip
+*.exe
+
+#coisas locais
+.mcp.json
+sysinfo.txt
+crashlytics-build.properties

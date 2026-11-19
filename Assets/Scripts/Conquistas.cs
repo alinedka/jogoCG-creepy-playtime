@@ -6,9 +6,9 @@ public static class Conquistas
 {
     static readonly List<string> pegos = new List<string>();
 
-    //comeca vazio a cada play
+    //comeca vazio a cada play e a cada jogador novo no menu
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-    static void Zerar()
+    public static void Zerar()
     {
         pegos.Clear();
         PlayerPrefs.DeleteKey("bichinhosPegos"); //versao antiga salvava no computador

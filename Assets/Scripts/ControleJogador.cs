@@ -27,6 +27,8 @@ public class ControleJogador : MonoBehaviour
     public Vector2 limiteMax = new Vector2(8.4f, 7.3f);
     public Transform[] obstaculos;
     public Transform[] obstaculosEscorregadios;
+    //objetos vazados (estantes): bloqueia so onde tem colisor, da para passar por baixo
+    public Transform[] obstaculosVazados;
     public float velocidadeEscorregar = 3f;
     public float folgaCabeca = 0.25f;
     public Transform plataforma;
@@ -65,6 +67,8 @@ public class ControleJogador : MonoBehaviour
     //cada obstaculo: retangulo no chao (visto de cima) + altura do topo
     struct Bloqueio { public Rect area; public float topo; public bool escorrega; }
     readonly System.Collections.Generic.List<Bloqueio> bloqueios = new System.Collections.Generic.List<Bloqueio>();
+    readonly System.Collections.Generic.HashSet<Collider> colisoresVazados = new System.Collections.Generic.HashSet<Collider>();
+    readonly Collider[] tocando = new Collider[16];
 
     void Start()
     {
@@ -76,6 +80,10 @@ public class ControleJogador : MonoBehaviour
         //cada obstaculo vira um retangulo no chao com a altura do topo
         AdicionarBloqueios(obstaculos, false);
         AdicionarBloqueios(obstaculosEscorregadios, true);
+        if (obstaculosVazados != null)
+            foreach (Transform v in obstaculosVazados)
+                if (v != null)
+                    foreach (Collider c in v.GetComponentsInChildren<Collider>()) colisoresVazados.Add(c);
 
         //deltaAngle transforma 350° em -10°, para o limite de cima/baixo funcionar
         Vector3 inicial = transform.localEulerAngles;
@@ -356,6 +364,7 @@ public class ControleJogador : MonoBehaviour
             if (grupo != null)
                 foreach (Renderer r in grupo.GetComponentsInChildren<Renderer>())
                 {
+                    if (EhVazado(r.transform)) continue;
                     Bounds b = r.bounds;
                     bloqueios.Add(new Bloqueio
                     {
@@ -413,7 +422,25 @@ public class ControleJogador : MonoBehaviour
         Vector2 xz = new Vector2(p.x, p.z);
         foreach (Bloqueio b in bloqueios)
             if (b.topo > pes + (b.escorrega ? 0f : degrau) && b.area.Contains(xz)) return false;
+
+        //estantes: corpo do jogador (dos pes + degrau ate os olhos) encostando nas colunas e prateleiras
+        if (colisoresVazados.Count > 0)
+        {
+            Vector3 baixo = new Vector3(p.x, pes + degrau + raioJogador, p.z);
+            Vector3 cima = new Vector3(p.x, pes + alturaOlhos, p.z);
+            int n = Physics.OverlapCapsuleNonAlloc(baixo, cima, raioJogador, tocando, ~0, QueryTriggerInteraction.Ignore);
+            for (int i = 0; i < n; i++)
+                if (colisoresVazados.Contains(tocando[i])) return false;
+        }
         return true;
+    }
+
+    bool EhVazado(Transform t)
+    {
+        if (obstaculosVazados == null) return false;
+        foreach (Transform v in obstaculosVazados)
+            if (v != null && t.IsChildOf(v)) return true;
+        return false;
     }
 
     bool NaPlataforma(Vector3 p)

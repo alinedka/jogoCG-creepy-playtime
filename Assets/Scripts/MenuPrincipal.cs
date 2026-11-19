@@ -91,6 +91,8 @@ public class MenuPrincipal : MonoBehaviour
     public void ComecarJogo()
     {
         Recordes.NomeAtual = campoNome != null ? campoNome.text : "";
+        //jogador novo comeca sem os bichinhos do anterior
+        Conquistas.Zerar();
         SceneManager.LoadScene(cenaDoJogo);
     }
 
